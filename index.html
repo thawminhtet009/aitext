@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>Recap Splitter · 2000 စာလုံး</title>
+<style>
+  :root{
+    --bg:#070b14;
+    --panel:rgba(17,24,39,.72);
+    --panel-2:rgba(2,6,23,.55);
+    --line:rgba(148,163,184,.22);
+    --line-strong:rgba(148,163,184,.38);
+    --text:#e8edf7;
+    --muted:#93a1b8;
+    --accent:#38bdf8;
+    --accent-2:#a78bfa;
+    --accent-3:#22d3ee;
+    --good:#34d399;
+    --radius:16px;
+    --shadow:0 20px 50px -20px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Myanmar", "Padauk", sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    padding:
+      max(14px, env(safe-area-inset-top))
+      max(14px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom))
+      max(14px, env(safe-area-inset-left));
+  }
+
+  /* ---------- animated background ---------- */
+  .bg{position:fixed; inset:0; z-index:-2; overflow:hidden; background:
+    radial-gradient(1200px 800px at 10% -10%, #1b2a52 0%, transparent 60%),
+    radial-gradient(900px 700px at 110% 10%, #2a1b4d 0%, transparent 55%),
+    radial-gradient(900px 900px at 50% 120%, #062a35 0%, transparent 60%),
+    #070b14;}
+  .bg::after{
+    content:""; position:absolute; inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:3px 3px; opacity:.5;
+    mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 75%);
+  }
+  .blob{
+    position:fixed; z-index:-1; border-radius:50%;
+    filter:blur(70px); opacity:.35; pointer-events:none;
+    animation:float 18s ease-in-out infinite;
+  }
+  .blob.a{width:340px;height:340px;background:#0ea5e9;top:-80px;left:-80px}
+  .blob.b{width:300px;height:300px;background:#8b5cf6;top:20%;right:-100px;animation-delay:-6s}
+  .blob.c{width:320px;height:320px;background:#06b6d4;bottom:-120px;left:30%;animation-delay:-12s}
+  @keyframes float{
+    0%,100%{transform:translate3d(0,0,0) scale(1)}
+    50%{transform:translate3d(0,-28px,0) scale(1.08)}
+  }
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:1120px; margin:0 auto; display:grid; gap:16px}
+
+  header.hero{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px; flex-wrap:wrap; padding:4px 2px;
+  }
+  .brand{display:flex; align-items:center; gap:12px; min-width:0}
+  .logo{
+    width:44px; height:44px; flex:none; border-radius:14px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid; place-items:center; font-size:20px;
+    box-shadow:0 10px 24px -8px rgba(56,189,248,.7);
+  }
+  h1{
+    font-size:clamp(16px, 2.6vw, 20px);
+    margin:0; line-height:1.25; letter-spacing:.2px;
+  }
+  h1 span{
+    display:block; font-size:12px; font-weight:500;
+    color:var(--muted); margin-top:3px; letter-spacing:.3px;
+  }
+
+  .badges{display:flex; gap:8px; flex-wrap:wrap}
+  .badge{
+    font-size:12px; padding:6px 11px; border-radius:999px;
+    border:1px solid var(--line); color:var(--muted);
+    background:var(--panel-2); backdrop-filter:blur(8px);
+    white-space:nowrap;
+  }
+  .badge b{color:var(--text); font-weight:700}
+
+  /* ---------- panel ---------- */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(14px) saturate(140%);
+    padding:16px;
+  }
+
+  label.lbl{
+    display:block; font-size:12.5px; color:var(--muted);
+    margin-bottom:8px; letter-spacing:.3px; font-weight:600;
+    text-transform:uppercase;
+  }
+
+  textarea{
+    width:100%; min-height:230px; resize:vertical;
+    padding:14px 15px;
+    background:rgba(2,6,23,.6);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:12px;
+    font:inherit; font-size:16px; line-height:1.7;
+    outline:none; transition:border-color .2s, box-shadow .2s;
+  }
+  textarea::placeholder{color:#5b6b84}
+  textarea:focus{
+    border-color:rgba(56,189,248,.6);
+    box-shadow:0 0 0 4px rgba(56,189,248,.13);
+  }
+
+  /* ---------- controls ---------- */
+  .controls{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap:12px;
+  }
+  .field{
+    display:flex; flex-direction:column; gap:6px;
+    padding:11px 13px; border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+  }
+  .field > span{font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.3px}
+  input[type="number"]{
+    width:100%; border:none; background:transparent; color:var(--text);
+    font:inherit; font-size:16px; font-weight:700; outline:none; padding:0;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+
+  .switch{
+    display:flex; align-items:center; gap:10px; cursor:pointer;
+    padding:11px 13px; border-radius:12px;
+    border:1px solid var(--line);
+    background:var(--panel-2);
+    font-size:14px; color:var(--text);
+    user-select:none; transition:border-color .2s, background .2s;
+    min-height:48px;
+  }
+  .switch:hover{border-color:var(--line-strong)}
+  .switch input{position:absolute; opacity:0; pointer-events:none}
+  .track{
+    width:40px; height:23px; border-radius:999px; flex:none;
+    background:rgba(148,163,184,.25); position:relative;
+    transition:background .25s;
+  }
+  .track::after{
+    content:""; position:absolute; top:3px; left:3px;
+    width:17px; height:17px; border-radius:50%; background:#fff;
+    transition:transform .25s;
+    box-shadow:0 2px 6px rgba(0,0,0,.4);
+  }
+  .switch input:checked + .track{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  }
+  .switch input:checked + .track::after{transform:translateX(17px)}
+  .switch input:focus-visible + .track{box-shadow:0 0 0 4px rgba(56,189,248,.25)}
+
+  .actions{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap:10px;
+  }
+  button{
+    font:inherit; font-size:15px; font-weight:650;
+    min-height:48px; padding:12px 18px;
+    border-radius:12px; border:1px solid var(--line);
+    background:rgba(148,163,184,.12); color:var(--text);
+    cursor:pointer; transition:transform .12s, filter .2s, background .2s, border-color .2s;
+    -webkit-tap-highlight-color:transparent;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  button:hover{background:rgba(148,163,184,.2); border-color:var(--line-strong)}
+  button:active{transform:scale(.97)}
+  button.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#061225; border-color:transparent;
+    box-shadow:0 12px 28px -12px rgba(56,189,248,.85);
+  }
+  button.primary:hover{filter:brightness(1.07)}
+  button.ghost{background:transparent}
+
+  .hint{
+    margin-top:12px; font-size:12.5px; line-height:1.7; color:var(--muted);
+    display:flex; gap:8px; align-items:flex-start;
+  }
+  .hint svg{flex:none; margin-top:2px; opacity:.7}
+
+  /* ---------- status ---------- */
+  .statusbar{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    margin-top:14px; font-size:13px; color:var(--muted);
+  }
+  .pill{
+    padding:6px 12px; border-radius:999px;
+    border:1px solid var(--line); background:var(--panel-2);
+  }
+  .pill b{color:var(--accent); font-weight:700}
+  .pill.ok b{color:var(--good)}
+
+  /* ---------- output ---------- */
+  #output{margin-top:16px; display:grid; gap:14px}
+
+  .chunk{
+    border:1px solid var(--line);
+    border-radius:14px; overflow:hidden;
+    background:rgba(2,6,23,.5);
+    animation:rise .35s ease both;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+
+  .chunk-head{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:11px 14px;
+    background:linear-gradient(180deg, rgba(30,41,59,.75), rgba(15,23,42,.5));
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:1;
+    backdrop-filter:blur(10px);
+  }
+  .chunk-title{
+    display:flex; align-items:center; gap:10px;
+    font-size:13.5px; font-weight:700; min-width:0;
+  }
+  .num{
+    width:26px; height:26px; flex:none; border-radius:8px;
+    display:grid; place-items:center; font-size:12px; font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#061225;
+  }
+  .count{font-size:12px; color:var(--muted); font-weight:600; white-space:nowrap}
+
+  .chunk-body{
+    padding:14px 15px; font-size:15px; line-height:1.85;
+    white-space:pre-wrap; word-break:break-word;
+    max-height:min(60vh, 520px); overflow:auto;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(148,163,184,.4) transparent;
+  }
+  .chunk-body::-webkit-scrollbar{width:8px}
+  .chunk-body::-webkit-scrollbar-thumb{
+    background:rgba(148,163,184,.35); border-radius:99px;
+  }
+
+  .copy{
+    min-height:0; padding:7px 13px; font-size:12.5px;
+    border-radius:9px; flex:none;
+    background:rgba(56,189,248,.12); border-color:rgba(56,189,248,.35);
+    color:#bae6fd;
+  }
+  .copy:hover{background:rgba(56,189,248,.22)}
+  .copy.done{
+    background:rgba(52,211,153,.18); border-color:rgba(52,211,153,.5); color:#a7f3d0;
+  }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom));
+    transform:translate(-50%, 20px);
+    padding:12px 18px; border-radius:12px;
+    background:rgba(15,23,42,.95); border:1px solid var(--line-strong);
+    color:var(--text); font-size:14px; font-weight:600;
+    box-shadow:var(--shadow); backdrop-filter:blur(10px);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+    z-index:50; max-width:90vw; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translate(-50%, 0)}
+
+  /* ---------- mobile ---------- */
+  @media (max-width:640px){
+    .panel{padding:14px; border-radius:14px}
+    header.hero{gap:10px}
+    h1 span{font-size:11.5px}
+    .controls{grid-template-columns:1fr 1fr}
+    .controls .switch{grid-column:1 / -1}
+    .actions{grid-template-columns:1fr 1fr}
+    .actions button.primary{grid-column:1 / -1; order:-1}
+    textarea{min-height:180px}
+    .chunk-body{max-height:none; font-size:15px}
+    .chunk-head{position:static}
+  }
+  @media (max-width:380px){
+    .controls{grid-template-columns:1fr}
+    .actions{grid-template-columns:1fr}
+    .badge{font-size:11px; padding:5px 9px}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="blob a"></div>
+<div class="blob b"></div>
+<div class="blob c"></div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="brand">
+      <div class="logo">✂</div>
+      <h1>
+        Recap စာလုံးရေ ခွဲပေးသည့် Tool
+        <span>Movie recap အတွက် 2000 စာလုံး အပိုင်းလိုက် တိတိကျကျ</span>
+      </h1>
+    </div>
+    <div class="badges">
+      <div class="badge">Auto split</div>
+      <div class="badge">Unicode အတိအကျ</div>
+    </div>
+  </header>
+
+  <section class="panel">
+    <label class="lbl" for="input">Recap စာသား</label>
+    <textarea id="input" placeholder="ဒီနေရာမှာ movie recap script ကို paste ပါ..."></textarea>
+
+    <div class="controls">
+      <label class="field">
+        <span>တစ်ပိုင်း စာလုံးရေ</span>
+        <input id="target" type="number" value="2000" min="1" inputmode="numeric">
+      </label>
+
+      <label class="switch">
+        <input type="checkbox" id="removeTs" checked>
+        <span class="track"></span>
+        <span>Timestamp ဖျက်မည်</span>
+      </label>
+
+      <label class="switch">
+        <input type="checkbox" id="autoSplit">
+        <span class="track"></span>
+        <span>Auto ခွဲမည်</span>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="splitBtn" class="primary">✂ ခွဲမည်</button>
+      <button id="copyAllBtn">အားလုံး Copy</button>
+      <button id="clearBtn" class="ghost">ရှင်းမည်</button>
+    </div>
+
+    <div class="hint">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>space နှင့် newline များကိုပါ စာလုံးရေအဖြစ် တွက်ပါသည်။ နောက်ဆုံးအပိုင်းမှသာ သတ်မှတ်ထားသည့် စာလုံးရေထက် နည်းနိုင်ပါသည်။</span>
+    </div>
+
+    <div class="statusbar" id="statusbar"></div>
+    <div id="output"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let lastChunks = [];
+let autoTimer = null;
+let toastTimer = null;
+
+function showToast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+function cleanText(text){
+  let s = text.replace(/\r\n?/g, "\n");
+  if ($("removeTs").checked){
+    s = s.replace(/[ \t]*\(\d{1,2}:\d{2}\)[ \t]*/g, " ");
+    s = s.replace(/[ \t]+\n/g, "\n");
+    s = s.replace(/\n{3,}/g, "\n\n");
+    s = s.trim();
+  }
+  return s;
+}
+
+// Unicode code point အတိုင်း တိတိကျကျ ခွဲသည်
+function splitExact(text, size){
+  const chars = Array.from(text);
+  const chunks = [];
+  for (let i = 0; i < chars.length; i += size){
+    chunks.push(chars.slice(i, i + size).join(""));
+  }
+  return chunks;
+}
+
+async function copyText(text){
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch {}
+    ta.remove();
+  }
+}
+
+function renderStatus(total, count){
+  $("statusbar").innerHTML = `
+    <div class="pill">စုစုပေါင်း <b>${total}</b> စာလုံး</div>
+    <div class="pill">အပိုင်း <b>${count}</b> ခု</div>
+  `;
+}
+
+function clearStatus(){
+  $("statusbar").innerHTML = "";
+}
+
+function render(){
+  const raw = $("input").value;
+  const size = Math.max(1, parseInt($("target").value || "2000", 10));
+  const text = cleanText(raw);
+  const output = $("output");
+
+  output.innerHTML = "";
+  lastChunks = [];
+
+  if (!text.trim()){
+    clearStatus();
+    return;
+  }
+
+  const chunks = splitExact(text, size);
+  lastChunks = chunks;
+  renderStatus(Array.from(text).length, chunks.length);
+
+  const frag = document.createDocumentFragment();
+
+  chunks.forEach((chunk, index) => {
+    const count = Array.from(chunk).length;
+
+    const section = document.createElement("section");
+    section.className = "chunk";
+    section.style.animationDelay = Math.min(index * 40, 300) + "ms";
+
+    const head = document.createElement("div");
+    head.className = "chunk-head";
+
+    const title = document.createElement("div");
+    title.className = "chunk-title";
+    title.innerHTML = `<span class="num">${index + 1}</span>
+      <span>အပိုင်း ${index + 1}</span>
+      <span class="count">· ${count} စာလုံး</span>`;
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "copy";
+    copyBtn.textContent = "Copy";
+    copyBtn.onclick = async () => {
+      await copyText(chunk);
+      copyBtn.textContent = "✓ Copied";
+      copyBtn.classList.add("done");
+      showToast(`အပိုင်း ${index + 1} ကို Copy လုပ်ပြီးပါပြီ`);
+      setTimeout(() => {
+        copyBtn.textContent = "Copy";
+        copyBtn.classList.remove("done");
+      }, 1500);
+    };
+
+    head.appendChild(title);
+    head.appendChild(copyBtn);
+
+    const body = document.createElement("div");
+    body.className = "chunk-body";
+    body.textContent = chunk;
+
+    section.appendChild(head);
+    section.appendChild(body);
+    frag.appendChild(section);
+  });
+
+  output.appendChild(frag);
+}
+
+$("splitBtn").onclick = render;
+
+$("clearBtn").onclick = () => {
+  $("input").value = "";
+  $("output").innerHTML = "";
+  clearStatus();
+  lastChunks = [];
+  showToast("ရှင်းလိုက်ပါပြီ");
+};
+
+$("copyAllBtn").onclick = async () => {
+  if (!lastChunks.length){
+    showToast("ခွဲထားသည့် အပိုင်း မရှိသေးပါ");
+    return;
+  }
+  await copyText(lastChunks.join("\n\n---\n\n"));
+  showToast("အပိုင်းအားလုံးကို Copy လုပ်ပြီးပါပြီ");
+};
+
+$("input").addEventListener("input", () => {
+  if (!$("autoSplit").checked) return;
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(render, 450);
+});
+
+$("autoSplit").addEventListener("change", () => {
+  if ($("autoSplit").checked) render();
+});
+
+$("target").addEventListener("change", () => {
+  if ($("autoSplit").checked) render();
+});
+</script>
+</body>
+</html>
